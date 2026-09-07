@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Подарок</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('фон.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            z-index: 0;
+        }
+
+        body.pink-bg::before {
+            opacity: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffffff;
+            transition: opacity 1.2s ease;
+            z-index: 0;
+        }
+
+        body.pink-bg::after {
+            opacity: 0;
+        }
+
+        .link {
+            color: black;
+            font-size: clamp(18px, 4vw, 24px);
+            text-decoration: underline;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            z-index: 2;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body.pink-bg .link {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .envelope {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            pointer-events: none;
+            z-index: 1;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body.pink-bg .envelope {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+
+        .envelope.hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translate(-50%, -50%) scale(0.5) !important;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .envelope svg {
+            display: block;
+            width: min(200px, 70vw);
+            height: auto;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .envelope:hover svg {
+            transform: scale(1.05);
+        }
+
+        .envelope.open .envelope-body {
+            animation: openEnvelope 0.8s ease forwards;
+        }
+
+        .envelope.open .envelope-flap {
+            animation: liftFlap 0.8s ease forwards;
+        }
+
+        @keyframes openEnvelope {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1) rotate(-2deg);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes liftFlap {
+            0% {
+                transform: rotate(0deg);
+                transform-origin: top;
+            }
+            100% {
+                transform: rotateX(180deg);
+                transform-origin: top;
+            }
+        }
+
+        .content-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            padding: 20px 20px;
+            box-sizing: border-box;
+        }
+
+        .envelope.open~.content-wrapper {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .envelope.hidden~.content-wrapper {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.5s ease;
+        }
+
+        .letter-title {
+            flex-shrink: 0;
+            max-width: 90vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .envelope.open~.content-wrapper .letter-title {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .letter-title img {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 60vw;
+            max-height: 12vh;
+            object-fit: contain;
+        }
+
+        .letter-container {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            transform: scale(0.3);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 90vw;
+            max-height: 75vh;
+        }
+
+        .envelope.open~.content-wrapper .letter-container {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .letter-flip {
+            position: relative;
+            width: auto;
+            height: auto;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .letter-flip.flipped .letter-front {
+            display: none;
+        }
+
+        .letter-flip.flipped .letter-back {
+            display: flex;
+        }
+
+        .letter-front,
+        .letter-back {
+            position: relative;
+            width: auto;
+            height: auto;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .letter-front {
+            z-index: 2;
+        }
+
+        .letter-back {
+            display: none;
+            z-index: 2;
+        }
+
+        .letter-front img,
+        .letter-back img {
+            display: block;
+            height: auto;
+            max-height: 75vh;
+            max-width: 90vw;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            object-fit: contain;
+        }
+
+        .flip-btn {
+            position: absolute;
+            bottom: 25px;
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #ff7f7f;
+            border-radius: 50px;
+            color: #ff7f7f;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .flip-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .flip-btn:active {
+            transform: scale(0.95);
+        }
+
+        .flip-btn .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .flip-btn:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        .flip-btn-forward {
+            right: 25px;
+            border-color: #ff7f7f;
+            color: #ff7f7f;
+        }
+
+        .flip-btn-forward:hover {
+            background: #ff7f7f;
+            color: white;
+            box-shadow: 0 6px 25px rgba(255, 127, 127, 0.4);
+        }
+
+        .flip-btn-back {
+            left: 25px;
+            border-color: #4a90d9;
+            color: #4a90d9;
+        }
+
+        .flip-btn-back:hover {
+            background: #4a90d9;
+            color: white;
+            box-shadow: 0 6px 25px rgba(74, 144, 217, 0.4);
+        }
+
+        .flip-btn-back:hover .arrow {
+            transform: translateX(-5px);
+        }
+
+        .letter-front .flip-btn-forward {
+            display: flex;
+        }
+
+        .letter-front .flip-btn-back {
+            display: none;
+        }
+
+        .letter-back .flip-btn-forward {
+            display: none;
+        }
+
+        .letter-back .flip-btn-back {
+            display: flex;
+        }
+
+        .letter-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            z-index: 9;
+        }
+
+        .envelope.open~.letter-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .envelope.hidden~.letter-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.5s ease;
+        }
+
+        .envelope.open svg {
+            opacity: 0.2;
+            filter: blur(3px);
+            transition: all 0.8s ease;
+        }
+
+        .close-letter {
+            display: none;
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 11;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .close-letter:hover {
+            transform: rotate(90deg);
+        }
+
+        .envelope.open~.close-letter {
+            display: block;
+        }
+
+        .back-to-envelope {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ff7f7f;
+            border-radius: 30px;
+            color: #ff7f7f;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 30;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: none;
+            pointer-events: none;
+            user-select: none;
+            font-family: Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .back-to-envelope:active {
+            transform: scale(0.95);
+        }
+
+        .gallery.active~.back-to-envelope {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Кнопка "Назад" из викторины — ведёт обратно на экран с видео
+           (не путать со старой, ошибочной версией, которая листала вопросы
+           внутри самой викторины). Позиционирование как у "Назад к письму". */
+        .quiz-video-back-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #4a90d9;
+            border-radius: 30px;
+            color: #4a90d9;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 75;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            user-select: none;
+            font-family: Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .quiz-video-back-btn:hover {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .quiz-video-back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .gallery {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .gallery.active {
+            display: block;
+            pointer-events: auto;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+            justify-items: center;
+            align-items: center;
+            align-content: center;
+            position: relative;
+        }
+
+        .gallery-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            font-family: 'Caveat', cursive;
+            font-size: clamp(28px, 5vw, 52px);
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 107, 138, 0.8), 0 0 40px rgba(255, 107, 138, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: auto;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 7;
+            text-align: center;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 35px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .gallery-title:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .gallery-title:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .gallery.active .gallery-title {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .gallery-title-second {
+            opacity: 0 !important;
+            transform: translate(-50%, -50%) scale(0.8) !important;
+            pointer-events: none !important;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .gallery-title-second.active {
+            opacity: 1 !important;
+            transform: translate(-50%, -50%) scale(1) !important;
+            pointer-events: auto !important;
+        }
+
+        .gallery-title.hidden-title {
+            opacity: 0 !important;
+            transform: translate(-50%, -50%) scale(0.8) !important;
+            pointer-events: none !important;
+        }
+
+        .photo-frame {
+            background: white;
+            padding: 8px 8px 6px 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 160px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            transform-origin: center center;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            z-index: 6;
+        }
+
+        .photo-frame:active {
+            transform: scale(0.95) !important;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 2px;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .photo-frame .label-top,
+        .photo-frame .label-bottom {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            padding: 4px 6px 2px 6px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.3px;
+            background: white;
+            color: #555;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .photo-frame .label-top {
+            color: #ff6b8a;
+            font-size: 12px;
+            padding-bottom: 2px;
+        }
+
+        .photo-frame .label-bottom {
+            color: #4a90d9;
+            font-size: 12px;
+            padding-top: 2px;
+        }
+
+        .photo-frame.hidden-frames {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .photo-frame.hidden-frames.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .photo-frame.fade-out {
+            opacity: 0;
+            transform: scale(0.8) rotate(0deg) !important;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+        }
+
+        .photo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 50;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            cursor: pointer;
+            padding: 20px;
+        }
+
+        .photo-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .photo-overlay-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            animation: zoomIn 0.4s ease;
+        }
+
+        @keyframes zoomIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .photo-overlay img {
+            max-width: 90vw;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .photo-overlay .overlay-top-label,
+        .photo-overlay .overlay-bottom-label {
+            color: white;
+            font-size: clamp(18px, 3vw, 28px);
+            font-weight: bold;
+            text-align: center;
+            padding: 12px 20px;
+            margin-top: 10px;
+            font-family: 'Arial', sans-serif;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            max-width: 90vw;
+        }
+
+        .photo-overlay .overlay-top-label {
+            color: #ffb6c1;
+            font-size: clamp(16px, 2.5vw, 24px);
+            margin-bottom: 5px;
+            margin-top: 0;
+        }
+
+        .photo-overlay .overlay-bottom-label {
+            color: #ffd700;
+            font-size: clamp(16px, 2.5vw, 24px);
+        }
+
+        .overlay-close {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            z-index: 55;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .overlay-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .overlay-close:active {
+            transform: scale(0.9);
+        }
+
+        .video-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 60;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .video-container video {
+            max-width: 80vw;
+            max-height: 70vh;
+            border-radius: 10px;
+            display: block;
+            background: #000;
+        }
+
+        .video-container .next-btn {
+            align-self: flex-end;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #ff7f7f;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 127, 127, 0.4);
+        }
+
+        .video-container .next-btn:hover {
+            background: #ff5e5e;
+            transform: scale(1.03);
+        }
+
+        .video-container .next-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quiz-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 70;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 30px 25px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: quizPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes quizPop {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .quiz-progress {
+            width: 100%;
+            height: 8px;
+            background: #ffe3e3;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .quiz-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff7f7f, #4a90d9);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .quiz-step-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 6px;
+            font-family: Arial, sans-serif;
+        }
+
+        .quiz-question {
+            font-family: 'Caveat', cursive;
+            font-weight: 700;
+            font-size: clamp(24px, 6vw, 30px);
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            padding: 12px 18px;
+            border: 2px solid #ff7f7f;
+            border-radius: 50px;
+            background: white;
+            color: #ff7f7f;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .quiz-option:hover {
+            background: #ff7f7f;
+            color: white;
+        }
+
+        .quiz-option.correct {
+            background: #6fcf97;
+            border-color: #6fcf97;
+            color: white;
+        }
+
+        .quiz-option.wrong {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .quiz-feedback {
+            margin-top: 14px;
+            font-size: 15px;
+            color: #4a90d9;
+            font-family: Arial, sans-serif;
+            min-height: 20px;
+        }
+
+        .quiz-final {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 70;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #fff0f0, #ffe3e3);
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .quiz-final-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+            animation: quizPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .quiz-final-content h1 {
+            font-family: 'Caveat', cursive;
+            font-weight: 700;
+            font-size: clamp(32px, 8vw, 52px);
+            color: #ff5e5e;
+            margin-bottom: 15px;
+        }
+
+        .quiz-final-content p {
+            font-family: Arial, sans-serif;
+            font-size: clamp(15px, 3.5vw, 18px);
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .heart-particle {
+            position: absolute;
+            top: -40px;
+            font-size: 22px;
+            pointer-events: none;
+            animation: fallHeart linear forwards;
+            z-index: 1;
+        }
+
+        @keyframes fallHeart {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .photo-frame:nth-child(1) {
+                transform: rotate(-3deg) translateY(-8px) translateX(-5px);
+            }
+            .photo-frame:nth-child(2) {
+                transform: rotate(8deg) translateY(4px) translateX(6px);
+            }
+            .photo-frame:nth-child(3) {
+                transform: rotate(-10deg) translateY(10px) translateX(-3px);
+            }
+            .photo-frame:nth-child(4) {
+                transform: rotate(2deg) translateY(-10px) translateX(8px);
+            }
+            .photo-frame:nth-child(5) {
+                transform: rotate(-6deg) translateY(12px) translateX(-6px);
+            }
+            .photo-frame:nth-child(6) {
+                transform: rotate(11deg) translateY(-5px) translateX(4px);
+            }
+            .photo-frame:nth-child(7) {
+                transform: rotate(-9deg) translateY(6px) translateX(-8px);
+            }
+            .photo-frame:nth-child(8) {
+                transform: rotate(7deg) translateY(-7px) translateX(5px);
+            }
+
+            .photo-frame.hidden-frames:nth-child(9) { transform: rotate(5deg) translateY(-6px) translateX(4px); }
+            .photo-frame.hidden-frames:nth-child(10) { transform: rotate(-7deg) translateY(8px) translateX(-5px); }
+            .photo-frame.hidden-frames:nth-child(11) { transform: rotate(4deg) translateY(-10px) translateX(7px); }
+            .photo-frame.hidden-frames:nth-child(12) { transform: rotate(-5deg) translateY(6px) translateX(-3px); }
+            .photo-frame.hidden-frames:nth-child(13) { transform: rotate(8deg) translateY(-4px) translateX(-6px); }
+            .photo-frame.hidden-frames:nth-child(14) { transform: rotate(-4deg) translateY(10px) translateX(5px); }
+            .photo-frame.hidden-frames:nth-child(15) { transform: rotate(6deg) translateY(-8px) translateX(-4px); }
+            .photo-frame.hidden-frames:nth-child(16) { transform: rotate(-6deg) translateY(5px) translateX(6px); }
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                gap: 16px;
+                padding: 18px;
+            }
+            .photo-frame {
+                max-width: 130px;
+                padding: 6px 6px 4px 6px;
+            }
+            .photo-frame .label-top,
+            .photo-frame .label-bottom {
+                font-size: 11px;
+                padding: 3px 4px 1px 4px;
+            }
+            .photo-frame .label-top {
+                font-size: 10px;
+            }
+            .photo-frame .label-bottom {
+                font-size: 10px;
+            }
+            .gallery-title {
+                font-size: clamp(22px, 4vw, 36px);
+                padding: 12px 25px;
+                white-space: normal;
+            }
+            .overlay-close {
+                top: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                gap: 14px;
+                padding: 14px;
+            }
+            .photo-frame {
+                max-width: 110px;
+                padding: 6px 6px 4px 6px;
+                border-width: 2px;
+            }
+            .photo-frame .label-top,
+            .photo-frame .label-bottom {
+                font-size: 10px;
+                padding: 2px 4px 1px 4px;
+            }
+            .photo-frame .label-top {
+                font-size: 9px;
+            }
+            .photo-frame .label-bottom {
+                font-size: 9px;
+            }
+
+            .photo-frame:nth-child(1) {
+                transform: rotate(-3deg);
+            }
+            .photo-frame:nth-child(2) {
+                transform: rotate(4deg);
+            }
+            .photo-frame:nth-child(3) {
+                transform: rotate(-3deg);
+            }
+            .photo-frame:nth-child(4) {
+                transform: rotate(4deg);
+            }
+            .photo-frame:nth-child(5) {
+                transform: rotate(-3deg);
+            }
+            .photo-frame:nth-child(6) {
+                transform: rotate(3deg);
+            }
+            .photo-frame:nth-child(7) {
+                transform: rotate(-4deg);
+            }
+            .photo-frame:nth-child(8) {
+                transform: rotate(3deg);
+            }
+
+            .photo-frame.hidden-frames:nth-child(9) { transform: rotate(3deg); }
+            .photo-frame.hidden-frames:nth-child(10) { transform: rotate(-4deg); }
+            .photo-frame.hidden-frames:nth-child(11) { transform: rotate(2deg); }
+            .photo-frame.hidden-frames:nth-child(12) { transform: rotate(-3deg); }
+            .photo-frame.hidden-frames:nth-child(13) { transform: rotate(4deg); }
+            .photo-frame.hidden-frames:nth-child(14) { transform: rotate(-2deg); }
+            .photo-frame.hidden-frames:nth-child(15) { transform: rotate(3deg); }
+            .photo-frame.hidden-frames:nth-child(16) { transform: rotate(-3deg); }
+
+            .gallery-title {
+                font-size: clamp(18px, 4.5vw, 26px);
+                padding: 10px 20px;
+                white-space: normal;
+                border-width: 1.5px;
+            }
+
+            .content-wrapper {
+                padding: 10px 10px;
+                gap: 8px;
+            }
+
+            .letter-title img {
+                max-width: 80vw;
+                max-height: 10vh;
+            }
+
+            .close-letter {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .letter-front img,
+            .letter-back img {
+                max-height: 65vh;
+                max-width: 92vw;
+            }
+
+            .flip-btn {
+                bottom: 15px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .flip-btn-forward {
+                right: 15px;
+            }
+
+            .flip-btn-back {
+                left: 15px;
+            }
+
+            .letter-container {
+                max-height: 70vh;
+            }
+
+            .back-to-envelope,
+            .quiz-video-back-btn {
+                bottom: 12px;
+                left: 12px;
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+
+            .envelope svg {
+                width: min(160px, 70vw);
+            }
+
+            .photo-overlay img {
+                max-height: 60vh;
+            }
+
+            .photo-overlay .overlay-top-label,
+            .photo-overlay .overlay-bottom-label {
+                font-size: clamp(14px, 3vw, 18px);
+                padding: 8px 14px;
+            }
+
+            .overlay-close {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .video-container {
+                padding: 12px;
+            }
+            .video-container video {
+                max-width: 90vw;
+                max-height: 60vh;
+            }
+            .video-container .next-btn {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .gallery-grid {
+                gap: 10px;
+                padding: 10px;
+            }
+            .photo-frame {
+                max-width: 90px;
+                padding: 5px 5px 3px 5px;
+                border-radius: 3px;
+            }
+            .photo-frame .label-top,
+            .photo-frame .label-bottom {
+                font-size: 9px;
+                padding: 1px 3px 0px 3px;
+            }
+            .photo-frame .label-top {
+                font-size: 8px;
+            }
+            .photo-frame .label-bottom {
+                font-size: 8px;
+            }
+
+            .gallery-title {
+                font-size: clamp(14px, 3.5vw, 20px);
+                padding: 8px 14px;
+            }
+
+            .content-wrapper {
+                padding: 8px 8px;
+                gap: 6px;
+            }
+
+            .letter-title img {
+                max-height: 8vh;
+                max-width: 70vw;
+            }
+
+            .flip-btn {
+                bottom: 10px;
+                padding: 6px 14px;
+                font-size: 11px;
+            }
+
+            .flip-btn-forward {
+                right: 10px;
+            }
+
+            .flip-btn-back {
+                left: 10px;
+            }
+
+            .letter-container {
+                max-height: 65vh;
+            }
+
+            .close-letter {
+                top: 10px;
+                right: 10px;
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .back-to-envelope,
+            .quiz-video-back-btn {
+                bottom: 10px;
+                left: 10px;
+                padding: 5px 10px;
+                font-size: 10px;
+            }
+
+            .envelope svg {
+                width: min(130px, 65vw);
+            }
+
+            .photo-overlay img {
+                max-height: 50vh;
+            }
+
+            .photo-overlay .overlay-top-label,
+            .photo-overlay .overlay-bottom-label {
+                font-size: clamp(12px, 2.5vw, 16px);
+                padding: 6px 10px;
+            }
+
+            .overlay-close {
+                top: 10px;
+                right: 10px;
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            .video-container {
+                padding: 8px;
+            }
+            .video-container video {
+                max-width: 95vw;
+                max-height: 50vh;
+            }
+            .video-container .next-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="link" id="giftLink">Подарок ещё подготавливается</div>
+
+    <div class="envelope" id="envelope">
+        <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect class="envelope-body" x="10" y="10" width="180" height="130" fill="#ff7f7f" rx="8" />
+            <polygon class="envelope-flap" points="10,10 100,80 190,10" fill="#ff5e5e" />
+            <polygon points="10,140 100,80 190,140" fill="#ff4c4c" />
+            <circle cx="100" cy="75" r="20" fill="#fff" />
+            <text x="88" y="84" font-size="25" fill="#ff7f7f">❤</text>
+        </svg>
+    </div>
+
+    <div class="letter-backdrop" id="letterBackdrop"></div>
+
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="letter-title" id="letterTitle">
+            <img src="текст.png" alt="Письмо любимой">
+        </div>
+
+        <div class="letter-container" id="letterContainer">
+            <div class="letter-flip" id="letterFlip">
+                <div class="letter-front">
+                    <img src="письмо.jpg" alt="Письмо 1">
+                    <button class="flip-btn flip-btn-forward" id="flipForward">
+                        Перелистнуть <span class="arrow">→</span>
+                    </button>
+                </div>
+                <div class="letter-back">
+                    <img src="письмо2.jpg" alt="Письмо 2">
+                    <button class="flip-btn flip-btn-back" id="flipBack">
+                        <span class="arrow">←</span> Назад
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="close-letter" id="closeLetter">✕</button>
+
+    <div class="gallery" id="gallery">
+        <div class="gallery-grid">
+            <div class="gallery-title" id="galleryTitle">Моя красивая</div>
+            <div class="gallery-title gallery-title-second" id="galleryTitleSecond">Моя художница</div>
+
+            <div class="photo-frame" data-img="фото1.jpg" data-top="23 июля 2011 г." data-bottom="Совсем ребенок">
+                <div class="label-top">23 июля 2011 г.</div>
+                <img src="фото1.jpg" alt="Фото 1">
+                <div class="label-bottom">Совсем ребенок</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото2.jpg" data-top="16 августа 2024 г." data-bottom="Капец, как выросла! 😨">
+                <div class="label-top">16 августа 2024 г.</div>
+                <img src="фото2.jpg" alt="Фото 2">
+                <div class="label-bottom">Капец, как выросла! 😨</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото3.jpg" data-top="29 июля 2025 г." data-bottom="Люблю Р❤">
+                <div class="label-top">29 июля 2025 г.</div>
+                <img src="фото3.jpg" alt="Фото 3">
+                <div class="label-bottom">Люблю Р❤</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото4.jpg" data-top="12 сентября 2025 г." data-bottom="Надеюсь не простыла..">
+                <div class="label-top">12 сентября 2025 г.</div>
+                <img src="фото4.jpg" alt="Фото 4">
+                <div class="label-bottom">Надеюсь не простыла..</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото5.jpg" data-top="8 ноября 2025 г." data-bottom="Мой фотограф ^-^">
+                <div class="label-top">8 ноября 2025 г.</div>
+                <img src="фото5.jpg" alt="Фото 5">
+                <div class="label-bottom">Мой фотограф ^-^</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото6.jpg" data-top="14 апреля 2026 г." data-bottom="Как из Pinterest'а!">
+                <div class="label-top">14 апреля 2026 г.</div>
+                <img src="фото6.jpg" alt="Фото 6">
+                <div class="label-bottom">Как из Pinterest'а!</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото7.jpg" data-top="8 июня 2026 г." data-bottom="Прям богиня красоты">
+                <div class="label-top">8 июня 2026 г.</div>
+                <img src="фото7.jpg" alt="Фото 7">
+                <div class="label-bottom">Прям богиня красоты</div>
+            </div>
+
+            <div class="photo-frame" data-img="фото8.jpg" data-top="10 августа 2026 г." data-bottom="Настоящая ты :3">
+                <div class="label-top">10 августа 2026 г.</div>
+                <img src="фото8.jpg" alt="Фото 8">
+                <div class="label-bottom">Настоящая ты :3</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото9.jpg" data-top="13 декабря 2024 г." data-bottom="Рисуночки в школе">
+                <div class="label-top">13 декабря 2024 г.</div>
+                <img src="фото9.jpg" alt="Фото 9">
+                <div class="label-bottom">Рисуночки в школе</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото10.jpg" data-top="27 января 2025 г." data-bottom="Смотрели гуля пх">
+                <div class="label-top">27 января 2025 г.</div>
+                <img src="фото10.jpg" alt="Фото 10">
+                <div class="label-bottom">Смотрели гуля пх</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото11.jpg" data-top="13 июля 2025 г." data-bottom="Училась анимировать">
+                <div class="label-top">13 июля 2025 г.</div>
+                <img src="фото11.jpg" alt="Фото 11">
+                <div class="label-bottom">Училась анимировать</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото12.jpg" data-top="28 июля 2025 г." data-bottom="Первый НАШ рисунок">
+                <div class="label-top">28 июля 2025 г.</div>
+                <img src="фото12.jpg" alt="Фото 12">
+                <div class="label-bottom">Первый НАШ рисунок</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото13.jpg" data-top="3 декабря 2025 г." data-bottom="Смотрели ОСД)">
+                <div class="label-top">3 декабря 2025 г.</div>
+                <img src="фото13.jpg" alt="Фото 13">
+                <div class="label-bottom">Смотрели ОСД)</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото14.jpg" data-top="29 декабря 2025 г." data-bottom="Подарок на НГ, ОБОЖАЮ!">
+                <div class="label-top">29 декабря 2025 г.</div>
+                <img src="фото14.jpg" alt="Фото 14">
+                <div class="label-bottom">Подарок на НГ, ОБОЖАЮ!</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото15.jpg" data-top="15 февраля 2026 г." data-bottom="Раскрашивали, мило">
+                <div class="label-top">15 февраля 2026 г.</div>
+                <img src="фото15.jpg" alt="Фото 15">
+                <div class="label-bottom">Раскрашивали, мило</div>
+            </div>
+
+            <div class="photo-frame hidden-frames" data-img="фото16.jpg" data-top="13 июля 2026 г." data-bottom="Заказ Анечке <3">
+                <div class="label-top">13 июля 2026 г.</div>
+                <img src="фото16.jpg" alt="Фото 16">
+                <div class="label-bottom">Заказ Анечке &lt;3</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-envelope" id="backToEnvelope">💌 Назад к письму</button>
+
+    <div class="photo-overlay" id="photoOverlay">
+        <button class="overlay-close" id="overlayClose">✕</button>
+        <div class="photo-overlay-content">
+            <div class="overlay-top-label" id="overlayTop"></div>
+            <img id="overlayImage" src="" alt="Увеличенное фото">
+            <div class="overlay-bottom-label" id="overlayBottom"></div>
+        </div>
+    </div>
+
+    <div class="video-container" id="videoContainer" style="display: none;">
+        <video id="giftVideo" controls autoplay muted playsinline webkit-playsinline>
+            <source src="video.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
+        <button class="next-btn" id="nextButton">Дальше →</button>
+    </div>
+
+    <div class="quiz-container" id="quizContainer">
+        <div class="quiz-card">
+            <div class="quiz-progress">
+                <div class="quiz-progress-bar" id="quizProgressBar"></div>
+            </div>
+            <div class="quiz-step-label" id="quizStepLabel"></div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+        </div>
+    </div>
+
+    <!-- Кнопка возврата с экрана викторины на экран с видео -->
+    <button class="quiz-video-back-btn" id="quizVideoBackBtn">← Назад к видео</button>
+
+    <div class="quiz-final" id="quizFinal">
+        <div class="quiz-final-content">
+            <h1>Молодчинка, на всё ответила правильно! 🥰</h1>
+            <p>жду отзыва в телеграмме хехе</p>
+        </div>
+    </div>
+
+    <script>
+        const link = document.getElementById('giftLink');
+        const envelope = document.getElementById('envelope');
+        const closeBtn = document.getElementById('closeLetter');
+        const backdrop = document.getElementById('letterBackdrop');
+        const letterFlip = document.getElementById('letterFlip');
+        const flipForward = document.getElementById('flipForward');
+        const flipBack = document.getElementById('flipBack');
+        const gallery = document.getElementById('gallery');
+        const backToEnvelope = document.getElementById('backToEnvelope');
+
+        const photoOverlay = document.getElementById('photoOverlay');
+        const overlayImage = document.getElementById('overlayImage');
+        const overlayTop = document.getElementById('overlayTop');
+        const overlayBottom = document.getElementById('overlayBottom');
+        const overlayClose = document.getElementById('overlayClose');
+
+        const galleryTitle = document.getElementById('galleryTitle');
+        const galleryTitleSecond = document.getElementById('galleryTitleSecond');
+
+        const videoContainer = document.getElementById('videoContainer');
+        const giftVideo = document.getElementById('giftVideo');
+        const nextButton = document.getElementById('nextButton');
+
+        let galleryShown = false;
+        let step = 0;
+
+        link.addEventListener('click', function() {
+            document.body.classList.add('pink-bg');
+        });
+
+        envelope.addEventListener('click', function(e) {
+            if (!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                letterFlip.classList.remove('flipped');
+                letterFlip.style.transform = '';
+                if (gallery.classList.contains('active')) {
+                    gallery.classList.remove('active');
+                }
+            }
+        });
+
+        function flipLetter(showBack) {
+            letterFlip.style.transition = 'transform 0.18s ease';
+            letterFlip.style.transform = 'scaleX(0.05)';
+            setTimeout(function() {
+                if (showBack) {
+                    letterFlip.classList.add('flipped');
+                } else {
+                    letterFlip.classList.remove('flipped');
+                }
+                letterFlip.style.transform = 'scaleX(1)';
+            }, 180);
+        }
+
+        flipForward.addEventListener('click', function(e) {
+            e.stopPropagation();
+            flipLetter(true);
+        });
+
+        flipBack.addEventListener('click', function(e) {
+            e.stopPropagation();
+            flipLetter(false);
+        });
+
+        function resetGallery() {
+            document.querySelectorAll('.photo-frame:not(.hidden-frames)').forEach(frame => {
+                frame.style.display = 'flex';
+                frame.classList.remove('fade-out');
+                frame.style.opacity = '1';
+                frame.style.transform = '';
+            });
+            document.querySelectorAll('.photo-frame.hidden-frames').forEach(frame => {
+                frame.style.display = 'none';
+                frame.classList.remove('active');
+                frame.style.opacity = '1';
+                frame.style.transform = '';
+            });
+            galleryTitle.classList.remove('hidden-title');
+            galleryTitleSecond.classList.remove('active');
+            galleryTitleSecond.style.opacity = '1';
+            galleryTitleSecond.style.transform = 'translate(-50%, -50%) scale(1)';
+            galleryTitleSecond.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            galleryTitle.style.pointerEvents = 'auto';
+            galleryTitleSecond.style.pointerEvents = 'auto';
+            videoContainer.style.display = 'none';
+            step = 0;
+        }
+
+        function closeLetterAndShowGallery() {
+            envelope.classList.remove('open');
+            letterFlip.classList.remove('flipped');
+            letterFlip.style.transform = '';
+            envelope.classList.add('hidden');
+
+            resetGallery();
+
+            if (!galleryShown) {
+                galleryShown = true;
+                setTimeout(() => {
+                    gallery.classList.add('active');
+                }, 500);
+            } else {
+                gallery.classList.add('active');
+            }
+        }
+
+        function backToEnvelopeFunc() {
+            gallery.classList.remove('active');
+            videoContainer.style.display = 'none';
+            envelope.classList.remove('hidden');
+            resetGallery();
+            setTimeout(() => {
+                envelope.classList.add('open');
+                letterFlip.classList.remove('flipped');
+                letterFlip.style.transform = '';
+            }, 300);
+        }
+
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeLetterAndShowGallery();
+        });
+
+        backdrop.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeLetterAndShowGallery();
+        });
+
+        backToEnvelope.addEventListener('click', function(e) {
+            e.stopPropagation();
+            backToEnvelopeFunc();
+        });
+
+        document.querySelectorAll('.photo-frame:not(.hidden-frames), .photo-frame.hidden-frames').forEach(function(frame) {
+            frame.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                if (this.classList.contains('fade-out')) return;
+                if (this.classList.contains('hidden-frames') && !this.classList.contains('active')) return;
+
+                const imgSrc = this.getAttribute('data-img');
+                const topText = this.getAttribute('data-top');
+                const bottomText = this.getAttribute('data-bottom');
+
+                if (imgSrc) {
+                    overlayImage.src = imgSrc;
+                    overlayTop.textContent = topText || '';
+                    overlayBottom.textContent = bottomText || '';
+                    photoOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+        });
+
+        function closeOverlay() {
+            photoOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        overlayClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeOverlay();
+        });
+
+        photoOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOverlay();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeOverlay();
+            }
+        });
+
+        function handleTitleClick(e) {
+            e.stopPropagation();
+
+            const firstGroup = document.querySelectorAll('.photo-frame:not(.hidden-frames)');
+            const secondGroup = document.querySelectorAll('.photo-frame.hidden-frames');
+
+            step++;
+
+            if (step === 1) {
+                firstGroup.forEach(frame => frame.classList.add('fade-out'));
+
+                galleryTitle.classList.add('hidden-title');
+                galleryTitleSecond.classList.add('active');
+
+                setTimeout(() => {
+                    firstGroup.forEach(frame => frame.style.display = 'none');
+                    secondGroup.forEach(frame => {
+                        frame.style.display = 'flex';
+                        setTimeout(() => frame.classList.add('active'), 50);
+                    });
+                }, 500);
+
+            } else if (step === 2) {
+                firstGroup.forEach(frame => {
+                    frame.classList.add('fade-out');
+                    setTimeout(() => frame.style.display = 'none', 500);
+                });
+                secondGroup.forEach(frame => {
+                    frame.classList.remove('active');
+                    frame.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    frame.style.opacity = '0';
+                    frame.style.transform = 'scale(0.8) rotate(0deg)';
+                    setTimeout(() => frame.style.display = 'none', 550);
+                });
+                galleryTitle.classList.add('hidden-title');
+                galleryTitleSecond.classList.remove('active');
+                galleryTitleSecond.style.transition = 'all 0.5s ease';
+                galleryTitleSecond.style.opacity = '0';
+                galleryTitleSecond.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                gallery.classList.remove('active');
+                videoContainer.style.display = 'flex';
+                galleryTitle.style.pointerEvents = 'none';
+                galleryTitleSecond.style.pointerEvents = 'none';
+
+                step = 0;
+            }
+        }
+
+        galleryTitle.addEventListener('click', handleTitleClick);
+        galleryTitleSecond.addEventListener('click', handleTitleClick);
+
+        const quizData = [
+            {
+                question: 'Сколько лет тебе сегодня исполняется?',
+                options: ['15', '16', '17'],
+                answer: '16'
+            },
+            {
+                question: 'Какого числа у тебя день рождения?',
+                options: ['18 сентября', '8 сентября', '8 августа'],
+                answer: '8 сентября'
+            },
+            {
+                question: 'Как мы с тобой познакомились?',
+                options: ['Через общих друзей', 'В игре, совершенно случайно', 'В школе'],
+                answer: 'В игре, совершенно случайно'
+            },
+            {
+                question: 'Какой жанр фильмов ты обожаешь?',
+                options: ['Ужасы', 'Комедии', 'Дорамы'],
+                answer: 'Дорамы'
+            },
+            {
+                question: 'Что ты делаешь, когда не знаешь, что ответить?',
+                options: ['Молчишь', 'Смеёшься', 'Мяукаешь'],
+                answer: 'Мяукаешь'
+            },
+            {
+                question: 'Как я тебя впервые назвал, после чего ты сказала: «ой, я обожаю, когда ты меня так называешь»?',
+                options: ['Котёнок', 'Зайчонок', 'Солнышко'],
+                answer: 'Зайчонок'
+            }
+        ];
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        const quizContainer = document.getElementById('quizContainer');
+        const quizProgressBar = document.getElementById('quizProgressBar');
+        const quizStepLabel = document.getElementById('quizStepLabel');
+        const quizQuestion = document.getElementById('quizQuestion');
+        const quizOptions = document.getElementById('quizOptions');
+        const quizFeedback = document.getElementById('quizFeedback');
+        const quizFinal = document.getElementById('quizFinal');
+        const quizVideoBackBtn = document.getElementById('quizVideoBackBtn');
+
+        let currentQuestion = 0;
+        let quizLocked = false;
+
+        function renderQuestion() {
+            quizLocked = false;
+            const q = quizData[currentQuestion];
+            quizStepLabel.textContent = 'Вопрос ' + (currentQuestion + 1) + ' из ' + quizData.length;
+            quizProgressBar.style.width = (currentQuestion / quizData.length) * 100 + '%';
+            quizQuestion.textContent = q.question;
+            quizFeedback.textContent = '';
+            quizOptions.innerHTML = '';
+
+            const shuffledOptions = shuffleArray(q.options);
+
+            shuffledOptions.forEach(function(optionText) {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = optionText;
+                btn.addEventListener('click', function() {
+                    handleAnswer(optionText, btn);
+                });
+                quizOptions.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedText, btn) {
+            if (quizLocked) return;
+            const q = quizData[currentQuestion];
+
+            if (selectedText === q.answer) {
+                quizLocked = true;
+                btn.classList.add('correct');
+                quizFeedback.textContent = 'Верно! 💕';
+                quizProgressBar.style.width = ((currentQuestion + 1) / quizData.length) * 100 + '%';
+
+                setTimeout(function() {
+                    currentQuestion++;
+                    if (currentQuestion < quizData.length) {
+                        renderQuestion();
+                    } else {
+                        showQuizFinal();
+                    }
+                }, 900);
+            } else {
+                btn.classList.add('wrong');
+                quizFeedback.textContent = 'Не в этот раз, попробуй ещё раз 😉';
+                setTimeout(function() {
+                    btn.classList.remove('wrong');
+                }, 400);
+            }
+        }
+
+        function startQuiz() {
+            // Останавливаем видео при переходе с него на викторину
+            if (giftVideo) {
+                giftVideo.pause();
+                giftVideo.currentTime = 0;
+            }
+
+            currentQuestion = 0;
+            videoContainer.style.display = 'none';
+            quizContainer.style.display = 'flex';
+            // Кнопка "Назад к видео" видна всё время, пока идёт викторина
+            quizVideoBackBtn.style.display = 'flex';
+            renderQuestion();
+        }
+
+        function showQuizFinal() {
+            quizContainer.style.display = 'none';
+            quizVideoBackBtn.style.display = 'none';
+            quizFinal.style.display = 'flex';
+            startHeartsRain();
+        }
+
+        // Кнопка "Назад к видео" — возвращает с ЛЮБОГО вопроса викторины
+        // на экран с видео (а не листает вопросы викторины назад).
+        function goBackToVideoFromQuiz() {
+            quizContainer.style.display = 'none';
+            quizVideoBackBtn.style.display = 'none';
+
+            // Сбрасываем прогресс викторины, чтобы при повторном нажатии
+            // "Дальше" она начиналась с первого вопроса заново.
+            currentQuestion = 0;
+            quizLocked = false;
+            quizProgressBar.style.width = '0%';
+
+            videoContainer.style.display = 'flex';
+
+            if (giftVideo) {
+                giftVideo.currentTime = 0;
+                const playPromise = giftVideo.play();
+                if (playPromise && playPromise.catch) {
+                    playPromise.catch(function() {
+                        // Если браузер отказал в автозапуске — не страшно,
+                        // у видео есть свои controls, можно нажать play вручную.
+                    });
+                }
+            }
+        }
+
+        quizVideoBackBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goBackToVideoFromQuiz();
+        });
+
+        function startHeartsRain() {
+            const heartsCount = 28;
+            for (let i = 0; i < heartsCount; i++) {
+                setTimeout(function() {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-particle';
+                    heart.textContent = ['❤', '💕', '💖', '💗'][Math.floor(Math.random() * 4)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (4 + Math.random() * 3) + 's';
+                    heart.style.fontSize = (16 + Math.random() * 16) + 'px';
+                    quizFinal.appendChild(heart);
+                    setTimeout(function() {
+                        heart.remove();
+                    }, 8000);
+                }, i * 250);
+            }
+        }
+
+        nextButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            startQuiz();
+        });
+
+        function resetToInitialState() {
+            document.body.classList.remove('pink-bg');
+
+            envelope.classList.remove('open', 'hidden');
+            letterFlip.classList.remove('flipped');
+            letterFlip.style.transform = '';
+
+            gallery.classList.remove('active');
+            galleryShown = false;
+            resetGallery();
+
+            videoContainer.style.display = 'none';
+            if (giftVideo) {
+                giftVideo.pause();
+                giftVideo.currentTime = 0;
+            }
+
+            quizContainer.style.display = 'none';
+            quizVideoBackBtn.style.display = 'none';
+            quizFinal.style.display = 'none';
+            quizFinal.querySelectorAll('.heart-particle').forEach(h => h.remove());
+            currentQuestion = 0;
+            quizLocked = false;
+
+            photoOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                resetToInitialState();
+            }
+        });
+    </script>
+
+</body>
+</html>
