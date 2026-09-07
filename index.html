@@ -1275,6 +1275,25 @@
                 padding: 8px 16px;
             }
         }
+                .quiz-back-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #4a90d9;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .quiz-back-btn:hover {
+            background: #357abd;
+            transform: scale(1.02);
+        }
+        .quiz-back-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -1449,6 +1468,7 @@
             <div class="quiz-question" id="quizQuestion"></div>
             <div class="quiz-options" id="quizOptions"></div>
             <div class="quiz-feedback" id="quizFeedback"></div>
+            <button class="quiz-back-btn" id="quizBackBtn" style="margin-top: 15px; padding: 8px 20px; background: #4a90d9; color: white; border: none; border-radius: 50px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.3s;">← Назад</button>
         </div>
     </div>
 
@@ -1739,7 +1759,7 @@
         let currentQuestion = 0;
         let quizLocked = false;
 
-        function renderQuestion() {
+                function renderQuestion() {
             quizLocked = false;
             const q = quizData[currentQuestion];
             quizStepLabel.textContent = 'Вопрос ' + (currentQuestion + 1) + ' из ' + quizData.length;
@@ -1759,6 +1779,15 @@
                 });
                 quizOptions.appendChild(btn);
             });
+
+            const backBtn = document.getElementById('quizBackBtn');
+            if (backBtn) {
+                if (currentQuestion === 0) {
+                    backBtn.style.display = 'none';
+                } else {
+                    backBtn.style.display = 'inline-block';
+                }
+            }
         }
 
         function handleAnswer(selectedText, btn) {
@@ -1828,6 +1857,19 @@
         nextButton.addEventListener('click', function(e) {
             e.stopPropagation();
             startQuiz();
+        });
+
+        document.getElementById('quizBackBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+                
+                // Сбрасываем прогресс-бар на правильное значение
+                const progress = (currentQuestion / quizData.length) * 100;
+                quizProgressBar.style.width = progress + '%';
+            }
         });
 
         function resetToInitialState() {
