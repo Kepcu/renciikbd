@@ -1788,7 +1788,13 @@
             }
         }
 
-        function startQuiz() {
+                function startQuiz() {
+            const giftVideo = document.getElementById('giftVideo');
+            if (giftVideo) {
+                giftVideo.pause();
+                giftVideo.currentTime = 0;
+            }
+            
             currentQuestion = 0;
             videoContainer.style.display = 'none';
             quizContainer.style.display = 'flex';
